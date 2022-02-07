@@ -1,32 +1,87 @@
+#[layout 참고] https://superkong1.tistory.com/15
 library(shiny)
+library(leaflet)
 
-# Define UI for app that draws a histogram ----
-ui <- fluidPage(
-  
-  # App title ----
-  titlePanel("Hello Shiny!"),
-  
-  # Sidebar layout with input and output definitions ----
-  sidebarLayout(
-    
-    # Sidebar panel for inputs ----
-    sidebarPanel(
-      
-      # Input: Slider for the number of bins ----
-      sliderInput(inputId = "bins",
-                  label = "Number of bins:",
-                  min = 1,
-                  max = 50,
-                  value = 30)
-      
-    ),
-    
-    # Main panel for displaying outputs ----
-    mainPanel(
-      
-      # Output: Histogram ----
-      plotOutput(outputId = "distPlot")
-      
-    )
-  )
+ui <- navbarPage(
+    'Covid19Veiw',
+    # Number of Covid19 Case in Korea
+    tabPanel(
+        'South-Korea',
+        fluidPage(
+            fluidRow(column(width = 12,
+                            theme='bootstrap.min.css',
+                            # App title ----
+                            titlePanel("World"),
+                            # Main panel for displaying outputs ----
+                            mainPanel(
+                                # Output: Histogram ----
+                                leafletOutput(outputId = "kormap",height=800),
+                            )
+                # # App title ----
+                # titlePanel("In South-Korea"),
+                # # Sidebar layout with input and output definitions ----
+                # sidebarLayout(
+                #     # Sidebar panel for inputs ----
+                #     sidebarPanel(
+                #     # Input: Slider for the number of bins ----
+                #     sliderInput(
+                #         inputId = "days",
+                #         label = "Number of days:",
+                #         min = 7,
+                #         max = 100,
+                #         value = 7
+                #         )
+                # ),
+                # # Main panel for displaying outputs ----
+                # mainPanel(
+                #     # Output: Histogram ----
+                #     plotOutput(outputId = "distPlot",height=400),
+                # )
+                # )
+
+            )),
+            fluidRow(
+                column(width = 12,
+                       # Sidebar layout with input and output definitions ----
+                       sidebarLayout(
+                           # Sidebar panel for inputs ----
+                           sidebarPanel(
+                               # Input: Slider for the number of bins ----
+                               sliderInput(
+                                   inputId = "days",
+                                   label = "Number of days:",
+                                   min = 7,
+                                   max = 100,
+                                   value = 7
+                               )
+                           ),
+                           # Main panel for displaying outputs ----
+                           mainPanel(
+                               # Output: Histogram ----
+                               plotOutput(outputId = "distPlot",height=400),
+                           )
+                       )
+                ))
+            )
+        ),
+    tabPanel(
+        'World',
+        fluidPage(
+            fluidRow(column(width = 12,
+                theme='bootstrap.min.css',
+                # App title ----
+                titlePanel("World"),
+                # Main panel for displaying outputs ----
+                mainPanel(
+                    # Output: Histogram ----
+                    leafletOutput(outputId = "worldmap",height=800),
+                )
+                )
+            )),
+            fluidRow(
+                column(width = 6,div(style = "height:150px;background-color: green;", "Bottomleft")),
+                column(width = 6,div(style = "height:150px;background-color: green;", "Bottomright")))
+            )
 )
+
+
