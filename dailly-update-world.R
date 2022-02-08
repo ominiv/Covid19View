@@ -4,12 +4,12 @@ if(!require(dplyr)) install.packages("dplyr", repos = "http://cran.us.r-project.
 if(!require(jsonlite)) install.packages("jsonlite", repos = "http://cran.us.r-project.org")
 
 # load API KEY
-load('./Data/environment.Rdata')
+load('./DATA/environment.Rdata')
 
 #########################################
 # covid19 Data in world
 #########################################
-res <- GET(paste0('http://openapi.data.go.kr/openapi/service/rest/Covid19/getCovid19NatInfStateJson?serviceKey=',api_key_decoding,'&pageNo=1&numOfRows=10&startCreateDt=',format(Sys.Date()-2,'%Y%m%d'),'&endCreateDt=',format(Sys.Date()-1,'%Y%m%d')))
+res <- GET(paste0('http://openapi.data.go.kr/openapi/service/rest/Covid19/getCovid19NatInfStateJson?serviceKey=',api_key_decode,'&pageNo=1&numOfRows=10&startCreateDt=',format(Sys.Date()-2,'%Y%m%d'),'&endCreateDt=',format(Sys.Date()-1,'%Y%m%d')))
 
 res %>%
     content(as ='text', encoding ='UTF-8') %>%
