@@ -40,11 +40,25 @@ a {
 
 /* ------------------------------------------------------------*/
 /* ---- TEXT -------*/
+/* Level 1 title */
+h1 {
+    font-size: 35px;
+    color: black;
+    font-weight: bold;
+}
 
 /* Level 2 title */
 h2 {
     font-size: 25px;
-    color: orange;
+    color: darkred;
+}
+
+/* Level 3 = Plot legends */
+h3 {
+    font-size: 15px;
+    line-height: 1.55;
+    color: #707070;
+    font-style: italic;
 }
 
 /* Level 5 = text of the story */
@@ -56,18 +70,12 @@ h5 {
 
 /* Level 6 = Green text sankey */
 h6 {
-    font-size: 22px;
-    line-height: 1.55;
-    color: #2ecc71;
-}
-
-/* Level 3 = Plot legends */
-h3 {
     font-size: 15px;
     line-height: 1.55;
-    color: #707070;
-    font-style: italic;
+    color: #154429;
 }
+
+
 /* ------------------------------------------------------------*/
 
 
@@ -77,6 +85,10 @@ h3 {
 
 /* ------------------------------------------------------------*/
 /* Sliders */
+#sidebar {
+    background-color: #ffffff;
+    border: 3px solid #2ecc71;
+}
 .irs-bar {
     border-top: 1px solid #2ecc71;
     border-bottom: 1px solid #2ecc71;

@@ -1,34 +1,67 @@
+# ----------------------------------------------
 # load required packages
-if(!require(ggplot2)) install.packages("ggplot2", repos = "http://cran.us.r-project.org")
-if(!require(leaflet)) install.packages("leaflet", repos = "http://cran.us.r-project.org")
-if(!require(dplyr)) install.packages("dplyr", repos = "http://cran.us.r-project.org")
-if(!require(raster)) install.packages("raster", repos = "http://cran.us.r-project.org")
-if(!require(sf)) install.packages("sf", repos = "http://cran.us.r-project.org")
-if(!require(rmapshaper)) install.packages("rmapshaper", repos = "http://cran.us.r-project.org")
+# ----------------------------------------------
+if(!suppressWarnings(require(ggplot2))) install.packages("ggplot2", repos = "http://cran.us.r-project.org")
+if(!suppressWarnings(require(leaflet))) install.packages("leaflet", repos = "http://cran.us.r-project.org")
+if(!suppressWarnings(require(dplyr))) install.packages("dplyr", repos = "http://cran.us.r-project.org")
+if(!suppressWarnings(require(raster))) install.packages("raster", repos = "http://cran.us.r-project.org")
+if(!suppressWarnings(require(sf))) install.packages("sf", repos = "http://cran.us.r-project.org")
+if(!suppressWarnings(require(rmapshaper))) install.packages("rmapshaper", repos = "http://cran.us.r-project.org")
+if(!suppressWarnings(require(plotly))) install.packages("plotly", repos = "http://cran.us.r-project.org")
+if(!suppressWarnings(require(gapminder))) install.packages("gapminder", repos = "http://cran.us.r-project.org")
 
+# ----------------------------------------------
+# Update Daily Dataset 
+# ----------------------------------------------
+# setwd('C:/Users/user/PJT/Study/11.Dashbord/Covid19View')
 load('./DATA/Korea_total_covid19.Rdata')
+
 if(sum(grepl(format(Sys.Date()-1,'%Y-%m-%d'),total$createDt)) == 0){
   source('dailly-update-korea.R')
   source('dailly-update-world.R')
 }
 
+# ----------------------------------------------
+# Server
+# ----------------------------------------------
 server <- function(input, output) {
     #########################################
     # Covid19 in South-Korea
     #########################################
     # Cumulative number of corona infected
     load('./DATA/Korea_total_covid19.Rdata')
-  
-    output$distPlot <- renderPlot({
+    output$reactive_case_count <- renderText({
+      if((total$defCnt[1]-total$defCnt[2])>=0){
+          paste0(format(total$defCnt[1] ,big.mark = ',',big.interval = 3), ' (+',format(total$defCnt[1]-total$defCnt[2] ,big.mark = ',',big.interval = 3),')')
+      }else{
+          paste0(format(total$defCnt[1] ,big.mark = ',',big.interval = 3), ' (',format(total$defCnt[1]-total$defCnt[2] ,big.mark = ',',big.interval = 3),')')
+
+      }
+    })
+    output$reactive_death_count <- renderText({
+      if((total$deathCnt[1]-total$deathCnt[2])>=0){
+        paste0(format(total$deathCnt[1] ,big.mark = ',',big.interval = 3), ' (+', format(total$deathCnt[1]-total$deathCnt[2] ,big.mark = ',',big.interval = 3),')')
+      }else{
+        paste0(format(total$deathCnt[1] ,big.mark = ',',big.interval = 3), ' (',format(total$deathCnt[1]-total$deathCnt[2] ,big.mark = ',',big.interval = 3),')')
+      }
+    })
+    output$reactive_deathrate_count <- renderText({
+        paste0(format(total$deathCnt[1]/total$defCnt[1]*100,digits=2),'%')
+    })
+    output$reactive_update <- renderText({
+        paste0(total$stdDay[1])
+    })
+    
+    output$distPlot <- renderPlotly({
       days <-  1:input$days
       #days <- 1:7
       x <- total[days,]
-      p <- ggplot(data=x, aes(x=createDt ,y=defCnt)) + 
+      p <- ggplotly(ggplot(data=x, aes(x=createDt ,y=defCnt)) + 
         geom_bar(stat = 'identity', width=0.5, fill='darkred')+
         theme_bw()+
         theme(axis.text.x=element_text(angle=45, hjust=1))+
-        scale_y_continuous(labels = scales::comma)
-      p
+        scale_y_continuous(labels = scales::comma))
+      
     })
     
     # South-Korea Map 
@@ -55,7 +88,7 @@ server <- function(input, output) {
                     highlight = highlightOptions(weight = 3,color = 'red',bringToFront = TRUE),
                     labelOptions = labelOptions(
                       style = list("font-weight" = "normal", padding = "2px 7px"),
-                      textsize = "13px",
+                      textsize = "14px",
                       direction = "auto"
                     )
         ) %>%
@@ -65,10 +98,9 @@ server <- function(input, output) {
     #########################################
     # Covid19 in world
     #########################################
-
     load('./DATA/World_covid19.Rdata')
     pal2 <- colorNumeric("viridis", world@data$natDefCnt, reverse=TRUE)
-
+    output$worldtable <- renderDataTable(world@data[!duplicated(world@data$areaNm),c('COUNTRYAFF','createDt', 'natDeathCnt', 'natDeathRate', 'natDefCnt')])
     output$worldmap <- renderLeaflet({
       DefCnt = reactive({
         format(world@data$natDefCnt,big.mark = ',',big.interval = 3)
@@ -76,7 +108,9 @@ server <- function(input, output) {
       DeathRate = reactive({
         format(world@data$natDeathRate,digits = 2)
       })
-
+      DeathCnt = reactive({
+        format(world@data$natDeathCnt,big.mark = ',',big.interval = 3)
+      })
       leaflet(world) %>% 
         setView(lng=30.9768,lat=37.5759, zoom=2.5) %>% #126
         addProviderTiles('CartoDB.Positron')%>%
