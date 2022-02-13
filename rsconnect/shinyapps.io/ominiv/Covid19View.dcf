@@ -1,0 +1,14 @@
+name: Covid19View
+title: Covid19View
+username:
+account: ominiv
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 5642237
+bundleId: 5573914
+url: https://ominiv.shinyapps.io/Covid19View/
+when: 1644737648.8755
+lastSyncTime: 1644737648.8755
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: COVID-19ForecastWhitePaper.pdf|FUNCTIONS/load_koera_covid19.R|FUNCTIONS/load_shp.R|FUNCTIONS/prediction.R|Prediction_Covid19.ipynb

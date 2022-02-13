@@ -1,26 +1,40 @@
 # Covid19View
 *edit by ominiv*
 
-shiny R package를 통해 국내외 Covid19 발생현황을 보여주고 추후 어떻게 증감될 것인지 예측해보자.
+## 프로젝트 목표
+국내외 Covid19 발생현황을 보여주고 추후 어떻게 증감될 것인지 예측해보자.
 
 ---
-## 결과물
+
+## 주요업무
+- 공공데이터 OpenApi를 활용해 데이터 수집
+- 데이터 전처리 및 시각화
+- 국내 확진자에 대한 시계열 데이터를 사용하여 예측모델 생성 (pytorch 기반 LSTM모델)
+- shiny R package를 통해 Dashboard 생성
+
 ---
-## 수행 과정
-- 22.02.06 : shiny R package 사전조사
-- 22.02.07 : api 적용 & leafletplot 추가
-- 22.02.08 : 국내외 데이터셋 구축 & leafletplot 수정
-- 22.02.09 : 세계지도 shp파일 적용 
-- 22.02.10 : layout 구성 완료
-- 22.02.11 : 예측 모델링
-- 22.02.12 : 배포예정
+## 결과
+- Dashboard online link: [https://ominiv.shinyapps.io/Covid19View/](https://ominiv.shinyapps.io/Covid19View/)
+- 국내외 Covid19 발생현황 정보 제공
+- 7일 간의 확진자 예보 서비스 제공
+
+    <img src="www/ominiv.shinyapps.io_Covid19View_.png"  width=400 > 
+
 ---
-### 아쉬운점
+## 아쉬운점
+- shiny package가 느리다.
+
 ---
+
+### TO-DO
+- 코로나 관련 뉴스데이터를 추가 하여 예측정확도 개선
+- 예측 정확도 추이 그래프생성
+
+---
+
 ## Reference
-
 <details>
-<summary> 참고 자료 </summary>
+<summary> 참고자료 </summary>
 <div markdown="1">
 
 - [corona-live](https://corona-live.com/)
@@ -31,6 +45,11 @@ shiny R package를 통해 국내외 Covid19 발생현황을 보여주고 추후 
 - [layout 참고](https://superkong1.tistory.com/15)
 - [leaflet desc](https://inziwiduk.blogspot.com/2019/01/r-shiny-interactive-mapping.html)
 - [위젯참고](https://wikidocs.net/71930)
+- [LSTM](https://pseudo-lab.github.io/Tutorial-Book/chapters/time-series/Ch4-LSTM.html)
+- [Google Forecast](https://datastudio.google.com/reporting/52f6e744-66c6-47aa-83db-f74201a7c4df/page/p_xasmskc9qc)
+- [Google Forecast desc](https://cloud.google.com/blog/ko/products/ai-machine-learning/google-and-harvard-improve-covid-19-forecasts)
+- [Hover Text](https://plotly.com/r/hover-text-and-formatting/)
+
 </div>
 </details>
 

@@ -1,5 +1,5 @@
 environment.Rdata
-*.csv
+*.pdf
 
 # History files
 .Rhistory

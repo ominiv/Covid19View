@@ -30,6 +30,9 @@ server <- function(input, output) {
     #########################################
     # Cumulative number of corona infected
     load('./DATA/Korea_total_covid19.Rdata')
+    preds = read.table('./DATA/Prediction_Confirmed_Case.csv',sep=',',header = TRUE)
+    colnames(preds) <- c('createDt','defCnt','label')
+ 
     output$reactive_case_count <- renderText({
       if((total$defCnt[1]-total$defCnt[2])>=0){
           paste0(format(total$defCnt[1] ,big.mark = ',',big.interval = 3), ' (+',format(total$defCnt[1]-total$defCnt[2] ,big.mark = ',',big.interval = 3),')')
@@ -48,21 +51,40 @@ server <- function(input, output) {
     output$reactive_deathrate_count <- renderText({
         paste0(format(total$deathCnt[1]/total$defCnt[1]*100,digits=2),'%')
     })
+    output$reactive_clear_count <- renderText({
+      if((total$isolClearCnt[1]-total$isolClearCnt[2])>=0){
+        paste0(format(total$isolClearCnt[1] ,big.mark = ',',big.interval = 3), ' (+', format(total$isolClearCnt[1]-total$isolClearCnt[2] ,big.mark = ',',big.interval = 3),')')
+      }else{
+        paste0(format(total$isolClearCnt[1] ,big.mark = ',',big.interval = 3), ' (',format(total$isolClearCnt[1]-total$isolClearCnt[2] ,big.mark = ',',big.interval = 3),')')
+      }
+    })
     output$reactive_update <- renderText({
-        paste0(total$stdDay[1])
+        paste0('Last Updated at ', total$createDt[1])
     })
     
-    output$distPlot <- renderPlotly({
-      days <-  1:input$days
-      #days <- 1:7
-      x <- total[days,]
-      p <- ggplotly(ggplot(data=x, aes(x=createDt ,y=defCnt)) + 
-        geom_bar(stat = 'identity', width=0.5, fill='darkred')+
+    output$ConfirmedBarPlot <- renderPlotly({
+      # days <-  1:input$days
+      # days <- 1:28
+      # x <- preds[,colnames(preds)]
+      historic_pos <- c(preds$label=='Historic')
+      forecast_pos <- c(preds$label=='Forecast')
+      historic_df <- tail(preds[historic_pos,],n=21)
+      forecast_df <- head(preds[forecast_pos,],n=7)
+      x <- rbind(historic_df, forecast_df)
+      
+      p <- ggplotly(ggplot(data=x) + 
+        geom_bar(aes(x=createDt ,y=defCnt,fill=label), stat = 'identity', width=0.5)+
+        geom_line(aes(x=createDt, y=defCnt),stat="identity",color="darkred",size=0.2, group = 1)+
+        scale_fill_manual(values = c('#1E88E5','#E57373'))+
         theme_bw()+
         theme(axis.text.x=element_text(angle=45, hjust=1))+
-        scale_y_continuous(labels = scales::comma))
-      
+        guides(fill=guide_legend(title=""))+
+        scale_y_continuous(labels = scales::comma)+
+          xlab(" ") +
+          ylab(" ")
+        )
     })
+    
     
     # South-Korea Map 
     load('./DATA/Korea_gubun_covid19.Rdata')
@@ -82,8 +104,8 @@ server <- function(input, output) {
         setView(lng=127.7669,lat=35.90776, zoom=7) %>%
         addProviderTiles('CartoDB.Positron')%>%
         addPolygons(color='#444', weight=1, fillColor=~pal1(defCnt),
-                    label = ~paste0('<b>',gubun,'</b> <br/> ',
-                                    'Covid19 Cases : ', korDefCnt(),' (<span style="color: darkred;">',korIncDec(),'</span> ) <br/> ',
+                    label = ~paste0('<b>',gubunEn,'</b> <br/> ',
+                                    'Confirmed Cases : ', korDefCnt(),' (<span style="color: darkred;">',korIncDec(),'</span> ) <br/> ',
                                     'Death Cases : ', korDeathCnt()) %>% lapply(htmltools::HTML),
                     highlight = highlightOptions(weight = 3,color = 'red',bringToFront = TRUE),
                     labelOptions = labelOptions(
@@ -95,6 +117,24 @@ server <- function(input, output) {
           addLegend(pal = pal2, values=~world@data$natDefCnt, opacity=0.9, title = "Covid cases", position = "bottomleft" )
       })
     
+    # South-Korea Pie
+    load('./DATA/Korea_GenAge.Rdata')
+    Age_df <- GenAge[-c(match(c('male','female'),GenAge$gubun)),]
+    Sex_df <- GenAge[c(match(c('male','female'),GenAge$gubun)),]
+    colors <- c('rgb(148,212,192)', 'rgb(175,189,219)', 'rgb(193,228,136)', 'rgb(237,214,180)', 'rgb(253,175,145)','rgb(240, 192, 206)','rgb(238,173,213)','rgb(255,228,110)','rgb(202,202,202)')
+    sex_colors <- c('rgb(245, 73, 73), rgb(81, 102, 207)')
+    output$AgePie <- renderPlotly({
+      fig <- plot_ly(Age_df,textinfo = 'label+percent',
+                     showlegend = FALSE) %>% 
+                     add_pie(data=Sex_df, labels= ~gubun, values = ~ confCase,hole = 0.7,sort = F,
+                             marker = list(colors = sex_colors, line = list(color = '#FFFFFF', width = 1))) %>% 
+                     add_pie(data=Age_df, labels= ~gubun, values = ~ confCase,hole = 0.6,sort = F,
+                             marker = list(colors = colors, line = list(color = '#FFFFFF', width = 1)),
+                             domain = list(
+                             x = c(0.15, 0.85),
+                             y = c(0.15, 0.85)))
+    })
+
     #########################################
     # Covid19 in world
     #########################################
@@ -116,7 +156,7 @@ server <- function(input, output) {
         addProviderTiles('CartoDB.Positron')%>%
         addPolygons(color='#444', weight=1, fillColor=~pal2(natDefCnt),
                     label = ~paste0('<b>',COUNTRY,'</b> <br/> ',
-                                    'Covid19 Cases : ', DefCnt(),' <br/> ',
+                                    'Confirmed Cases : ', DefCnt(),' <br/> ',
                                     'DeathRate : ', DeathRate(),'%') %>% lapply(htmltools::HTML),
                     highlight = highlightOptions(weight = 3,color = 'red',bringToFront = TRUE),
                     labelOptions = labelOptions(
