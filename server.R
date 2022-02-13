@@ -29,7 +29,6 @@ server <- function(input, output) {
     # Covid19 in South-Korea
     #########################################
     # Cumulative number of corona infected
-    load('./DATA/Korea_total_covid19.Rdata')
     preds = read.table('./DATA/Prediction_Confirmed_Case.csv',sep=',',header = TRUE)
     colnames(preds) <- c('createDt','defCnt','label')
  
@@ -69,7 +68,9 @@ server <- function(input, output) {
       historic_pos <- c(preds$label=='Historic')
       forecast_pos <- c(preds$label=='Forecast')
       historic_df <- tail(preds[historic_pos,],n=21)
-      forecast_df <- head(preds[forecast_pos,],n=7)
+      forecast_df <- preds[forecast_pos,]
+      forecast_df <- forecast_df[as.Date(forecast_df$createDt) > max(as.Date(historic_df$createDt)),]
+      forecast_df <- head(forecast_df,n=7)
       x <- rbind(historic_df, forecast_df)
       
       p <- ggplotly(ggplot(data=x) + 
@@ -117,23 +118,23 @@ server <- function(input, output) {
           addLegend(pal = pal2, values=~world@data$natDefCnt, opacity=0.9, title = "Covid cases", position = "bottomleft" )
       })
     
-    # South-Korea Pie
-    load('./DATA/Korea_GenAge.Rdata')
-    Age_df <- GenAge[-c(match(c('male','female'),GenAge$gubun)),]
-    Sex_df <- GenAge[c(match(c('male','female'),GenAge$gubun)),]
-    colors <- c('rgb(148,212,192)', 'rgb(175,189,219)', 'rgb(193,228,136)', 'rgb(237,214,180)', 'rgb(253,175,145)','rgb(240, 192, 206)','rgb(238,173,213)','rgb(255,228,110)','rgb(202,202,202)')
-    sex_colors <- c('rgb(245, 73, 73), rgb(81, 102, 207)')
-    output$AgePie <- renderPlotly({
-      fig <- plot_ly(Age_df,textinfo = 'label+percent',
-                     showlegend = FALSE) %>% 
-                     add_pie(data=Sex_df, labels= ~gubun, values = ~ confCase,hole = 0.7,sort = F,
-                             marker = list(colors = sex_colors, line = list(color = '#FFFFFF', width = 1))) %>% 
-                     add_pie(data=Age_df, labels= ~gubun, values = ~ confCase,hole = 0.6,sort = F,
-                             marker = list(colors = colors, line = list(color = '#FFFFFF', width = 1)),
-                             domain = list(
-                             x = c(0.15, 0.85),
-                             y = c(0.15, 0.85)))
-    })
+    # # South-Korea Pie
+    # load('./DATA/Korea_GenAge.Rdata')
+    # Age_df <- GenAge[-c(match(c('male','female'),GenAge$gubun)),]
+    # Sex_df <- GenAge[c(match(c('male','female'),GenAge$gubun)),]
+    # colors <- c('rgb(148,212,192)', 'rgb(175,189,219)', 'rgb(193,228,136)', 'rgb(237,214,180)', 'rgb(253,175,145)','rgb(240, 192, 206)','rgb(238,173,213)','rgb(255,228,110)','rgb(202,202,202)')
+    # sex_colors <- c('rgb(245, 73, 73), rgb(81, 102, 207)')
+    # output$AgePie <- renderPlotly({
+    #   fig <- plot_ly(Age_df,textinfo = 'label+percent',
+    #                  showlegend = FALSE) %>% 
+    #                  add_pie(data=Sex_df, labels= ~gubun, values = ~ confCase,hole = 0.7,sort = F,
+    #                          marker = list(colors = sex_colors, line = list(color = '#FFFFFF', width = 1))) %>% 
+    #                  add_pie(data=Age_df, labels= ~gubun, values = ~ confCase,hole = 0.6,sort = F,
+    #                          marker = list(colors = colors, line = list(color = '#FFFFFF', width = 1)),
+    #                          domain = list(
+    #                          x = c(0.15, 0.85),
+    #                          y = c(0.15, 0.85)))
+    # })
 
     #########################################
     # Covid19 in world

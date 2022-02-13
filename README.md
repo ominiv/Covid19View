@@ -18,7 +18,7 @@
 - 국내외 Covid19 발생현황 정보 제공
 - 7일 간의 확진자 예보 서비스 제공
 
-    <img src="www/ominiv.shinyapps.io_Covid19View_.png"  width=400 > 
+    <img src="www/ominiv.shinyapps.io_Covid19View_.png"  width=400 >
 
 ---
 ## 아쉬운점
