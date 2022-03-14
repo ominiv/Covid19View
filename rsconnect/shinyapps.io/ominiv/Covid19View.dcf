@@ -5,10 +5,10 @@ account: ominiv
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 5642237
-bundleId: 5574462
+bundleId: 5604445
 url: https://ominiv.shinyapps.io/Covid19View/
-when: 1644763677.13402
-lastSyncTime: 1644763677.13402
+when: 1645509705.86775
+lastSyncTime: 1645509705.86775
 asMultiple: FALSE
 asStatic: FALSE
 ignoredFiles: COVID-19ForecastWhitePaper.pdf|FUNCTIONS/load_koera_covid19.R|FUNCTIONS/load_shp.R|www/ominiv.shinyapps.io_Covid19View_.png

@@ -65,11 +65,12 @@ server <- function(input, output) {
       # days <-  1:input$days
       # days <- 1:28
       # x <- preds[,colnames(preds)]
-      historic_pos <- c(preds$label=='Historic')
       forecast_pos <- c(preds$label=='Forecast')
-      historic_df <- tail(preds[historic_pos,],n=21)
       forecast_df <- preds[forecast_pos,]
-      forecast_df <- forecast_df[as.Date(forecast_df$createDt) > max(as.Date(historic_df$createDt)),]
+      historic_df <- head(total,n=21)
+      historic_df <- historic_df[order(as.Date(historic_df$createDt),decreasing=FALSE),c('createDt', 'defCnt')]
+      historic_df['label'] <- 'Historic'
+      forecast_df <- forecast_df[as.Date(forecast_df$createDt) > max(as.Date(total$createDt)),]
       forecast_df <- head(forecast_df,n=7)
       x <- rbind(historic_df, forecast_df)
       

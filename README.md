@@ -14,7 +14,6 @@
 
 ---
 ## 결과
-- Dashboard online link: [https://ominiv.shinyapps.io/Covid19View/](https://ominiv.shinyapps.io/Covid19View/)
 - 국내외 Covid19 발생현황 정보 제공
 - 7일 간의 확진자 예보 서비스 제공
 
